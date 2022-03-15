@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "name": "fe-shopping",
   "version": "1.0.0",
   "description": "clone coupang web site",
@@ -26,5 +27,5 @@
   },
   "dependencies": {
     "express": "^4.17.3"
-  }
+  },
 }
