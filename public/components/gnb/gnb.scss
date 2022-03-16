@@ -1,0 +1,8 @@
+.gnb {
+  display: flex;
+  justify-content: space-between;
+
+  &-item:not(:first-of-type, :last-of-type) {
+    padding: 0 10px;
+  }
+}
