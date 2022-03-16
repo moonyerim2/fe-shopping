@@ -1,0 +1,19 @@
+.product-search-form {
+  display: flex;
+  align-items: center;
+  margin: 15px 0 0 20px;
+  width: 518px;
+  height: 40px;
+  border: 2px solid $mainColor;
+
+  &__category {
+    width: 135px;
+    padding: 10px;
+    border-right: 1px solid $borderColor;
+  }
+
+  &__input {
+    padding: 0 10px;
+    width: 100%;
+  }
+}
