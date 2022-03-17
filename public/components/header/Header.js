@@ -1,9 +1,21 @@
-class Header extends HTMLElement{
-  constructor() {
-    super();
-    this.innerHTML = this.template();
-  }
+import { ProductSearchForm } from './product-search-form/js/productSearchForm.js';
 
+class Header {
+  constructor() {
+    this.CLASSNAME = 'header';
+    this.creatInnerComponents();
+    this.template = this.template();
+  }
+  
+  creatInnerComponents() {
+    this.productSearchForm = new ProductSearchForm();
+  }
+  
+  addEvent($startingDom) {
+    const $trigger = $startingDom.querySelector(`.${this.CLASSNAME}`);
+    this.productSearchForm.addEvent($trigger);
+  }
+  
   template() {
     return `<top-bar></top-bar>
       <header class="header">    
@@ -13,7 +25,7 @@ class Header extends HTMLElement{
             <h1>
               <a href="#" class="header__logo">coupang</a>
             </h1>
-            <product-search-form></product-search-form>
+            ${this.productSearchForm.template}
           </div>
           <nav-gnb></nav-gnb>
         </section>
@@ -38,7 +50,5 @@ class Header extends HTMLElement{
       </header>`;
   }
 }
-
-window.customElements.define('renewal-header', Header);
 
 export default Header;
