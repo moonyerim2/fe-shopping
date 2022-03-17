@@ -1,8 +1,5 @@
-@import "./util/variable.scss";
-@import "./util/reset.scss";
-@import "./util/mixin.scss";
-@import "./util/util.scss";
-@import "./components/top-bar/top-bar.scss";
-@import "./components/gnb/gnb.scss";
-@import "./components/product-search-form/product-search-form.scss";
-@import "./layout/renewal-header/renewal-header.scss";
+@import "./base/scss/variable.scss";
+@import "./base/scss/reset.scss";
+@import "./base/scss/mixin.scss";
+@import "./base/scss/util.scss";
+@import "./components/header/header.scss";

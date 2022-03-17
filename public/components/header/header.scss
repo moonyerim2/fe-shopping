@@ -1,3 +1,8 @@
+@import "./top-bar/top-bar.scss";
+@import "./gnb/gnb.scss";
+@import "./product-search-form/scss/product-search-form.scss";
+@import "./product-search-form/scss/search-word-modal.scss";
+
 .header {
   display: flex;
   justify-content: space-between;

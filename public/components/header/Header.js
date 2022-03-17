@@ -1,4 +1,4 @@
-class RenewalHeader extends HTMLElement{
+class Header extends HTMLElement{
   constructor() {
     super();
     this.innerHTML = this.template();
@@ -39,6 +39,6 @@ class RenewalHeader extends HTMLElement{
   }
 }
 
-window.customElements.define('renewal-header', RenewalHeader);
+window.customElements.define('renewal-header', Header);
 
-export default RenewalHeader;
+export default Header;
