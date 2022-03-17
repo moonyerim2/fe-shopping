@@ -1,7 +1,6 @@
-class Gnb extends HTMLElement{
+class Gnb {
   constructor() {
-    super();
-    this.innerHTML = this.template();
+    this.template = this.template();
   }
 
   template() {
@@ -20,6 +19,4 @@ class Gnb extends HTMLElement{
   }
 }
 
-window.customElements.define('nav-gnb', Gnb);
-
-export default Gnb;
+export { Gnb };

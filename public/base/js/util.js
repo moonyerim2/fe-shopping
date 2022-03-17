@@ -1,7 +1,11 @@
-  class Util {
-    static sleep(ms) {
-      return new Promise((r) => setTimeout(r, ms));
-    }
+class Util {
+  static sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
   }
 
-  export { Util };
+  static getElementByClassName($startingDom, className) {
+    return $startingDom.querySelector(`.${className}`);
+  }
+}
+
+export { Util };

@@ -1,23 +1,28 @@
+import { Util } from '../../base/js/util.js';
+import { TopBar } from './top-bar/topBar.js';
 import { ProductSearchForm } from './product-search-form/js/productSearchForm.js';
+import { Gnb } from './gnb/gnb.js';
 
 class Header {
   constructor() {
-    this.CLASSNAME = 'header';
     this.creatInnerComponents();
+    this.CLASSNAME = 'header';
     this.template = this.template();
   }
-  
+
   creatInnerComponents() {
+    this.topBar = new TopBar();
     this.productSearchForm = new ProductSearchForm();
+    this.gnb = new Gnb();
   }
-  
+
   addEvent($startingDom) {
-    const $trigger = $startingDom.querySelector(`.${this.CLASSNAME}`);
+    const $trigger = Util.getElementByClassName($startingDom, this.CLASSNAME);
     this.productSearchForm.addEvent($trigger);
   }
-  
+
   template() {
-    return `<top-bar></top-bar>
+    return `${this.topBar.template}
       <header class="header">    
         <button class="header__category-btn">카테고리</button>
         <section>
@@ -27,7 +32,7 @@ class Header {
             </h1>
             ${this.productSearchForm.template}
           </div>
-          <nav-gnb></nav-gnb>
+          ${this.gnb.template}
         </section>
         <ul class="header__icon-menu">
           <li class="icon-menu__my-coupang">
@@ -51,4 +56,4 @@ class Header {
   }
 }
 
-export default Header;
+export { Header };

@@ -1,8 +1,9 @@
-class TopBar extends HTMLElement {
+class TopBar {
   constructor() {
-    super();
-    this.innerHTML = this.template();
-    this.style.background = '#f0f0f0';
+    this.template = this.template();
+    this.style = {
+      background: '#f0f0f0',
+    };
   }
 
   template() {
@@ -18,10 +19,8 @@ class TopBar extends HTMLElement {
         <li class="li-item">고객센터</li>
         </ul>
       </div>
-    </div>`
+    </div>`;
   }
 }
 
-window.customElements.define('top-bar', TopBar);
-
-export default TopBar;
+export { TopBar };

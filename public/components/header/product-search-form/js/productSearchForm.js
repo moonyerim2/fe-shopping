@@ -21,7 +21,7 @@ class ProductSearchForm {
   }
 
   addEvent($startingDom) {
-    const $trigger = $startingDom.querySelector(`.${this.CLASSNAME.INPUT}`);
+    const $trigger = Util.getElementByClassName($startingDom, this.CLASSNAME.INPUT);
     $trigger.addEventListener('keyup', this.searchEventHandler.bind(this));
   }
 
