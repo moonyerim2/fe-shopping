@@ -1,9 +1,6 @@
 class TopBar {
   constructor() {
     this.template = this.template();
-    this.style = {
-      background: '#f0f0f0',
-    };
   }
 
   template() {
