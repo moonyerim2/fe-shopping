@@ -1,0 +1,16 @@
+/* eslint-disable no-promise-executor-return */
+class Util {
+  static sleep(ms) {
+    return new Promise(r => setTimeout(r, ms));
+  }
+
+  static getElementByClassName($startingDom, className) {
+    return $startingDom.querySelector(`.${className}`);
+  }
+
+  static isPromise(p) {
+    return p && Object.prototype.toString.call(p) === '[object Promise]';
+  }
+}
+
+export { Util };
