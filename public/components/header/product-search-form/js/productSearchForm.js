@@ -2,7 +2,6 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable import/extensions */
 import { Util } from '../../../../base/js/util.js';
-import { fetchMatchingData } from './fetch.js';
 import { SearchTermModal } from './searchTermModal.js';
 
 class ProductSearchForm {
@@ -19,21 +18,17 @@ class ProductSearchForm {
     this.searchTermModal = new SearchTermModal();
   }
 
-  autoCompleteSearchTerm(inputValue) {
-    const url = `https://completion.amazon.com/api/2017/suggestions?session-id=133-4736477-7395454&customer-id=&request-id=4YM3EXKRH1QJB16MSJGT&page-type=Gateway&lop=en_US&site-variant=desktop&client-info=amazon-search-ui&mid=ATVPDKIKX0DER&alias=aps&b2b=0&fresh=0&ks=71&prefix=${inputValue}&event=onKeyPress&limit=11&fb=1&suggestion-type=KEYWORD`;
-    fetchMatchingData(url);
-  }
-
   renderSearchTermModal(target, inputValue) {
     const modalNode = this.searchTermModal.createModalNode(inputValue);
-    const fragment = document.createDocumentFragment();
-    fragment.appendChild(modalNode);
-    target.after(fragment);
+    if (Util.isPromise(modalNode)) {
+      modalNode.then(modalNode => target.after(modalNode));
+    } else {
+      target.after(modalNode);
+    }
   }
 
   deleteSearchTermModal() {
     const modalNode = this.searchTermModal.getModalNode();
-
     if (!modalNode) {
       return;
     }
@@ -43,7 +38,7 @@ class ProductSearchForm {
   focusEventHandler({ target }) {
     if (target.className === this.CLASSNAME.INPUT) {
       const inputValue = target.value;
-      this.renderSearchTermModal(target, inputValue);
+      // this.renderSearchTermModal(target, inputValue);
     }
   }
 
@@ -57,9 +52,6 @@ class ProductSearchForm {
     const inputValue = target.value;
     this.deleteSearchTermModal();
     this.renderSearchTermModal(target, inputValue);
-    if (inputValue) {
-      Util.sleep(500).then(() => this.autoCompleteSearchTerm(inputValue));
-    }
   }
 
   addEvent($startingDom) {
@@ -68,7 +60,9 @@ class ProductSearchForm {
       this.CLASSNAME.FORM,
     );
 
+    // focusout 왜 안되지
     $trigger.addEventListener('click', this.focusEventHandler.bind(this));
+    // $trigger.addEventListener('focusout', this.blurEventHandler.bind(this));
     document.body.addEventListener('click', this.blurEventHandler.bind(this));
     $trigger.addEventListener('keyup', this.keyupEventHandler.bind(this));
   }
