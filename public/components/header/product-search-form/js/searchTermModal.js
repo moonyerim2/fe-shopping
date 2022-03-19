@@ -19,6 +19,10 @@ class SearchTermModal {
     };
     this.storage = new Storage(this.STORAGE_KEYS);
     this.template = this.template(this.storage.recentSearchTerms);
+    this.promiseController = {
+      abortController: null,
+      isPending: false,
+    };
   }
 
   getModalNode() {
@@ -27,7 +31,19 @@ class SearchTermModal {
 
   fetchAutoCompleteSearchTerms(inputValue) {
     const url = `https://completion.amazon.com/api/2017/suggestions?session-id=133-4736477-7395454&customer-id=&request-id=4YM3EXKRH1QJB16MSJGT&page-type=Gateway&lop=en_US&site-variant=desktop&client-info=amazon-search-ui&mid=ATVPDKIKX0DER&alias=aps&b2b=0&fresh=0&ks=71&prefix=${inputValue}&event=onKeyPress&limit=11&fb=1&suggestion-type=KEYWORD`;
-    return Util.fetchMatchingData(url);
+
+    if (this.promiseController.isPending) {
+      this.promiseController.abortController.abort();
+    }
+    this.promiseController.abortController = new AbortController();
+    this.promiseController.isPending = true;
+
+    return fetch(url, { signal: this.promiseController.abortController.signal })
+      .then(res => res.json())
+      .then(terms => terms.suggestions.map(v => v.value))
+      .finally(() => {
+        this.promiseController.isPending = false;
+      });
   }
 
   insertAutoComptetingList(modal, inputValue) {
@@ -55,6 +71,7 @@ class SearchTermModal {
   insertTermList(modal, inputValue) {
     if (!inputValue) {
       this.insertRecentSearchList(modal);
+      this.promiseController.abortController.abort();
     } else {
       this.insertAutoComptetingList(modal, inputValue);
     }
@@ -62,7 +79,6 @@ class SearchTermModal {
   }
 
   makeTermList(dataList) {
-    console.log(1212, dataList);
     return dataList.reduce(
       (template, data) =>
         `${template}<li class=${this.CLASSNAME.LIST_ITEM}>${data}</li>`,

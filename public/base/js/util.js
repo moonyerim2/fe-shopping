@@ -22,11 +22,6 @@ class Util {
   static isPromise(p) {
     return p && Object.prototype.toString.call(p) === '[object Promise]';
   }
-
-  static fetchMatchingData = url =>
-    fetch(url)
-      .then(res => res.json())
-      .then(data => data.suggestions.map(v => v.value));
 }
 
 export { Util };
