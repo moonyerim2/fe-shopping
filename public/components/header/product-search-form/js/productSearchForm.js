@@ -2,6 +2,7 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable import/extensions */
 import { Util } from '../../../../base/js/util.js';
+import { DomUtil } from '../../../../base/js/DomUtil.js';
 import { SearchTermModal } from './searchTermModal.js';
 
 class ProductSearchForm {
@@ -18,40 +19,21 @@ class ProductSearchForm {
     this.searchTermModal = new SearchTermModal();
   }
 
-  renderSearchTermModal(target, inputValue) {
-    const modalNode = this.searchTermModal.createModalNode(inputValue);
-    if (Util.isPromise(modalNode)) {
-      modalNode.then(modalNode => target.after(modalNode));
-    } else {
-      target.after(modalNode);
+  focusinEventHandler({ target }) {
+    if (!target.value) {
+      const modalNode = this.searchTermModal.getModalNode();
+      DomUtil.visible(modalNode);
     }
   }
 
-  deleteSearchTermModal() {
+  focusoutEventHandler() {
     const modalNode = this.searchTermModal.getModalNode();
-    if (!modalNode) {
-      return;
-    }
-    modalNode.remove();
+    DomUtil.hidden(modalNode);
   }
 
-  focusEventHandler({ target }) {
-    if (target.className === this.CLASSNAME.INPUT) {
-      const inputValue = target.value;
-      // this.renderSearchTermModal(target, inputValue);
-    }
-  }
-
-  blurEventHandler({ target }) {
-    if (target.className !== this.CLASSNAME.INPUT) {
-      this.deleteSearchTermModal();
-    }
-  }
-
-  keyupEventHandler({ target }) {
-    const inputValue = target.value;
-    this.deleteSearchTermModal();
-    this.renderSearchTermModal(target, inputValue);
+  inputEventHandler({ target }) {
+    const modalNode = this.searchTermModal.getModalNode();
+    this.searchTermModal.insertTermList(modalNode, target.value);
   }
 
   addEvent($startingDom) {
@@ -60,11 +42,12 @@ class ProductSearchForm {
       this.CLASSNAME.FORM,
     );
 
-    // focusout 왜 안되지
-    $trigger.addEventListener('click', this.focusEventHandler.bind(this));
-    // $trigger.addEventListener('focusout', this.blurEventHandler.bind(this));
-    document.body.addEventListener('click', this.blurEventHandler.bind(this));
-    $trigger.addEventListener('keyup', this.keyupEventHandler.bind(this));
+    $trigger.addEventListener('focusin', this.focusinEventHandler.bind(this));
+    $trigger.addEventListener('focusout', this.focusoutEventHandler.bind(this));
+    $trigger.addEventListener(
+      'input',
+      Util.debounce(this.inputEventHandler.bind(this), 200),
+    );
   }
 
   template() {
@@ -72,6 +55,7 @@ class ProductSearchForm {
       <div class="product-search-form__category">전체</div>
       <label class="size-0" for="productSearchInput"></label>
       <input type="text" id="productSearchInput" class="${this.CLASSNAME.INPUT}" title="쿠팡 상품 검색" placeholder="찾고 싶은 상품을 검색해보세요"/>
+      ${this.searchTermModal.template}
     </form>`;
   }
 }
