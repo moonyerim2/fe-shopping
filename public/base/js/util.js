@@ -4,6 +4,17 @@ class Util {
     return new Promise(r => setTimeout(r, ms));
   }
 
+  static debounce(f, ms) {
+    let timer = null;
+
+    return (...args) => {
+      clearTimeout(timer);
+      return new Promise(r => {
+        timer = setTimeout(() => r(f(...args)), ms);
+      });
+    };
+  }
+
   static getElementByClassName($startingDom, className) {
     return $startingDom.querySelector(`.${className}`);
   }
