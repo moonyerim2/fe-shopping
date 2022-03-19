@@ -4,6 +4,7 @@
 /* eslint-disable import/extensions */
 import { DomUtil } from '../../../../base/js/DomUtil.js';
 import { Util } from '../../../../base/js/util.js';
+import { Storage } from '../../../../model/Storage.js';
 
 /* eslint-disable import/prefer-default-export */
 class SearchTermModal {
@@ -13,7 +14,11 @@ class SearchTermModal {
       LIST: 'search-term-modal__list',
       LIST_ITEM: 'search-term-modal__list-item',
     };
-    this.template = this.template();
+    this.STORAGE_KEYS = {
+      recentSearchTerms: 'recentSearchTerms',
+    };
+    this.storage = new Storage(this.STORAGE_KEYS);
+    this.template = this.template(this.storage.recentSearchTerms);
   }
 
   getModalNode() {
@@ -42,9 +47,9 @@ class SearchTermModal {
 
   insertRecentSearchList(modal) {
     DomUtil.visible(modal);
-    modal.innerHTML = this.recentSearchTermTemplate();
-    // inputValue가 비었다
-    // fetch 하지말고 로컬스토리지에서 dataList 가져오기
+    modal.innerHTML = this.recentSearchTermTemplate(
+      this.storage.recentSearchTerms,
+    );
   }
 
   insertTermList(modal, inputValue) {
@@ -57,6 +62,7 @@ class SearchTermModal {
   }
 
   makeTermList(dataList) {
+    console.log(1212, dataList);
     return dataList.reduce(
       (template, data) =>
         `${template}<li class=${this.CLASSNAME.LIST_ITEM}>${data}</li>`,
@@ -64,18 +70,22 @@ class SearchTermModal {
     );
   }
 
-  recentSearchTermTemplate() {
+  recentSearchTermTemplate(dataList) {
+    const ulTemplate = dataList
+      ? `<ul class = ${this.CLASSNAME.LIST}>${this.makeTermList(dataList)}</ul>`
+      : `<ul class = ${this.CLASSNAME.LIST}></ul>`;
+
     return `<div class="search-term-modal__title">최근 검색어</div>
-      <ul class = ${this.CLASSNAME.LIST}></ul>
+      ${ulTemplate}
       <div class="search-term-modal__under-bar">
         <button>전체삭제</button>
         <button>최근검색어끄기</button>
       </div>`;
   }
 
-  template() {
+  template(dataList) {
     return `<div class=${this.CLASSNAME.MODAL}>
-      ${this.recentSearchTermTemplate()}
+      ${this.recentSearchTermTemplate(dataList)}
     </div>`;
   }
 }

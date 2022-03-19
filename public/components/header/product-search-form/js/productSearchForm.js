@@ -36,6 +36,15 @@ class ProductSearchForm {
     this.searchTermModal.insertTermList(modalNode, target.value);
   }
 
+  submitEventHandler({ target }) {
+    const $input = Util.getElementByClassName(target, this.CLASSNAME.INPUT);
+    const recentTerms = this.searchTermModal.storage.recentSearchTerms;
+    const key = this.searchTermModal.STORAGE_KEYS.recentSearchTerms;
+    if ($input.value) {
+      this.searchTermModal.storage.storeInput(key, recentTerms, $input.value);
+    }
+  }
+
   addEvent($startingDom) {
     const $trigger = Util.getElementByClassName(
       $startingDom,
@@ -44,6 +53,7 @@ class ProductSearchForm {
 
     $trigger.addEventListener('focusin', this.focusinEventHandler.bind(this));
     $trigger.addEventListener('focusout', this.focusoutEventHandler.bind(this));
+    $trigger.addEventListener('submit', this.submitEventHandler.bind(this));
     $trigger.addEventListener(
       'input',
       Util.debounce(this.inputEventHandler.bind(this), 200),
@@ -55,6 +65,7 @@ class ProductSearchForm {
       <div class="product-search-form__category">전체</div>
       <label class="size-0" for="productSearchInput"></label>
       <input type="text" id="productSearchInput" class="${this.CLASSNAME.INPUT}" title="쿠팡 상품 검색" placeholder="찾고 싶은 상품을 검색해보세요"/>
+      <input type="submit" value="" class="product-search-form__btn"/>
       ${this.searchTermModal.template}
     </form>`;
   }
