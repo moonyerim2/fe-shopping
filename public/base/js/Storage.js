@@ -19,12 +19,13 @@ class Storage {
     return JSON.parse(localStorage.getItem(key));
   }
 
-  storeInput(key, currentData, inputValue) {
-    if (!currentData) {
+  storeInput(keyData, inputValue) {
+    const { key, dataLength } = keyData;
+    if (!this[key]) {
       this.setItem(key, [inputValue]);
-    } else if (currentData.length <= 10) {
-      currentData.push(inputValue);
-      this.setItem(key, [...new Set(currentData)]);
+    } else if (this[key].length < dataLength) {
+      this[key].push(inputValue);
+      this.setItem(key, [...new Set(this[key])]);
     }
   }
 }

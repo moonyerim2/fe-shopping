@@ -1,22 +1,18 @@
 /* eslint-disable import/prefer-default-export */
 /* eslint-disable class-methods-use-this */
 /* eslint-disable import/extensions */
-import { Util } from '../../../../base/js/util.js';
-import { DomUtil } from '../../../../base/js/DomUtil.js';
-import { SearchTermModal } from './searchTermModal.js';
+import { Util } from '../../../base/js/util.js';
+import { DomUtil } from '../../../base/js/DomUtil.js';
+import { SearchTermModal } from './search-term-modal/searchTermModal.js';
 
 class ProductSearchForm {
   constructor() {
-    this.creatInnerComponents();
     this.CLASSNAME = {
       FORM: 'product-search-form',
       INPUT: 'product-search-form__input',
     };
-    this.template = this.template();
-  }
-
-  creatInnerComponents() {
     this.searchTermModal = new SearchTermModal();
+    this.template = this.template();
   }
 
   focusinEventHandler({ target }) {
@@ -36,12 +32,12 @@ class ProductSearchForm {
     this.searchTermModal.insertTermList(modalNode, target.value);
   }
 
-  submitEventHandler({ target }) {
-    const $input = Util.getElementByClassName(target, this.CLASSNAME.INPUT);
-    const recentTerms = this.searchTermModal.storage.recentSearchTerms;
-    const key = this.searchTermModal.STORAGE_KEYS.recentSearchTerms;
+  submitEventHandler(e) {
+    e.preventDefault();
+    const $input = Util.getElementByClassName(e.target, this.CLASSNAME.INPUT);
+    const keyData = this.searchTermModal.STORAGE_KEYS.recentSearchTerms;
     if ($input.value) {
-      this.searchTermModal.storage.storeInput(key, recentTerms, $input.value);
+      this.searchTermModal.storage.storeInput(keyData, $input.value);
     }
   }
 
