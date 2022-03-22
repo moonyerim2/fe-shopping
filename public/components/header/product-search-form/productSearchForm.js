@@ -38,55 +38,66 @@ class ProductSearchForm {
     }
   }
 
-  checkSelectedItem(termList, className) {
-    for (let i = 0; i < termList.length; i++) {
-      if (termList[i].classList.contains(className)) {
+  checkSelectedItem(termLiItems, className) {
+    for (let i = 0; i < termLiItems.length; i++) {
+      if (termLiItems[i].classList.contains(className)) {
         return i;
       }
-      if (i === termList.length - 1) {
+      if (i === termLiItems.length - 1) {
         return null;
       }
     }
   }
 
-  downKeyHandler(termList, className) {
-    const currentIndex = this.checkSelectedItem(termList, className);
+  downKeyHandler(termLiItems, className, inputBox) {
+    const currentIndex = this.checkSelectedItem(termLiItems, className);
 
     if (currentIndex === null) {
-      termList[0].classList.add(className);
-    } else if (currentIndex === termList.length - 1) {
-      termList[currentIndex].classList.remove(className);
-      termList[0].classList.add(className);
+      termLiItems[0].classList.add(className);
+    } else if (currentIndex === termLiItems.length - 1) {
+      termLiItems[currentIndex].classList.remove(className);
+      termLiItems[0].classList.add(className);
     } else {
-      termList[currentIndex].classList.remove(className);
-      termList[currentIndex].nextElementSibling.classList.add(className);
+      termLiItems[currentIndex].classList.remove(className);
+      termLiItems[currentIndex].nextElementSibling.classList.add(className);
+      inputBox.value = termLiItems[currentIndex].nextElementSibling.textContent;
     }
   }
 
-  upKeyHandler(termList, className) {
-    const currentIndex = this.checkSelectedItem(termList, className);
+  upKeyHandler(termLiItems, className, inputBox) {
+    const currentIndex = this.checkSelectedItem(termLiItems, className);
+    if (currentIndex === null) {
+      return;
+    }
 
     if (currentIndex !== null && !currentIndex) {
-      termList[currentIndex].classList.remove(className);
+      termLiItems[currentIndex].classList.remove(className);
     } else {
-      termList[currentIndex].classList.remove(className);
-      termList[currentIndex].previousElementSibling.classList.add(className);
+      termLiItems[currentIndex].classList.remove(className);
+      termLiItems[currentIndex].previousElementSibling.classList.add(className);
+      inputBox.value = termLiItems[currentIndex].previousElementSibling.textContent;
     }
   }
 
   keydownEventHandler(modalNode, e) {
+    if (e.isComposing) return;
+
+    const { keyCode, target } = e;
     const className = `${this.searchTermModal.CLASSNAME.LIST_ITEM}__select`;
     const termList = Util.getElementByClassName(
       modalNode,
       this.searchTermModal.CLASSNAME.LIST,
-    ).children;
+    );
+    const termLiItems = termList ? termList.children : null;
 
-    if (e.keyCode === 40) {
-      this.downKeyHandler(termList, className);
-    }
+    if (termLiItems && termLiItems.length) {
+      if (keyCode === 40) {
+        this.downKeyHandler(termLiItems, className, target);
+      }
 
-    if (e.keyCode === 38) {
-      this.upKeyHandler(termList, className);
+      if (keyCode === 38) {
+        this.upKeyHandler(termLiItems, className, target);
+      }
     }
   }
 
