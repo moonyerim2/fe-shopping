@@ -23,9 +23,9 @@ class Storage {
     const { key, dataLength } = keyData;
     if (!this[key]) {
       this.setItem(key, [inputValue]);
-    } else if (this[key].length < dataLength) {
+    } else if (this[key].length < dataLength && this[key].indexOf(inputValue) === -1) {
       this[key].push(inputValue);
-      this.setItem(key, [...new Set(this[key])]);
+      this.setItem(key, this[key]);
     }
   }
 }
