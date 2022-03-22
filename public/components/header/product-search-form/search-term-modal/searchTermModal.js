@@ -1,12 +1,8 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable arrow-parens */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable import/extensions */
 import { DomUtil } from '../../../../base/js/DomUtil.js';
 import { Util } from '../../../../base/js/util.js';
 import { Storage } from '../../../../base/js/Storage.js';
 import { FetchController } from '../../../../base/js/FetchController.js';
-/* eslint-disable import/prefer-default-export */
+
 class SearchTermModal {
   constructor() {
     this.CLASSNAME = {
@@ -21,7 +17,7 @@ class SearchTermModal {
       },
     };
     this.storage = new Storage(this.STORAGE_KEYS);
-    this.AutoCompleteTermFetchController = new FetchController();
+    this.autoCompleteTermFetchController = new FetchController();
     this.template = this.template(this.storage.recentSearchTerms);
   }
 
@@ -31,9 +27,9 @@ class SearchTermModal {
 
   fetchAutoCompleteSearchTerms(inputValue) {
     const url = `https://completion.amazon.com/api/2017/suggestions?session-id=133-4736477-7395454&customer-id=&request-id=4YM3EXKRH1QJB16MSJGT&page-type=Gateway&lop=en_US&site-variant=desktop&client-info=amazon-search-ui&mid=ATVPDKIKX0DER&alias=aps&b2b=0&fresh=0&ks=71&prefix=${inputValue}&event=onKeyPress&limit=11&fb=1&suggestion-type=KEYWORD`;
-    return this.AutoCompleteTermFetchController.fetch(url).then(terms =>
-      terms.suggestions.map(v => v.value),
-    );
+    return this.autoCompleteTermFetchController
+      .fetch(url)
+      .then(terms => terms.suggestions.map(v => v.value));
   }
 
   insertAutoComptetingList(modal, inputValue) {
@@ -41,6 +37,7 @@ class SearchTermModal {
       .then(dataList => {
         if (!dataList.length) {
           DomUtil.hidden(modal);
+          modal.innerHTML = '';
         } else {
           DomUtil.visible(modal);
           const liTemplate = this.makeTermList(dataList);
@@ -61,11 +58,16 @@ class SearchTermModal {
   insertTermList(modal, inputValue) {
     if (!inputValue) {
       this.insertRecentSearchList(modal);
-      this.AutoCompleteTermFetchController.abort();
+      this.autoCompleteTermFetchController.abort();
     } else {
       this.insertAutoComptetingList(modal, inputValue);
     }
     return modal;
+  }
+
+  addEvent() {
+    const modalNode = this.getModalNode();
+    modalNode.addEventListener('mousedown', e => e.preventDefault());
   }
 
   makeTermList(dataList) {

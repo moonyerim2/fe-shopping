@@ -1,6 +1,3 @@
-/* eslint-disable import/prefer-default-export */
-/* eslint-disable class-methods-use-this */
-/* eslint-disable import/extensions */
 import { Util } from '../../../base/js/util.js';
 import { DomUtil } from '../../../base/js/DomUtil.js';
 import { SearchTermModal } from './search-term-modal/searchTermModal.js';
@@ -15,20 +12,19 @@ class ProductSearchForm {
     this.template = this.template();
   }
 
-  focusinEventHandler({ target }) {
-    if (!target.value) {
-      const modalNode = this.searchTermModal.getModalNode();
+  focusinEventHandler(modalNode) {
+    if (modalNode.innerHTML === '') {
+      DomUtil.hidden(modalNode);
+    } else {
       DomUtil.visible(modalNode);
     }
   }
 
-  focusoutEventHandler() {
-    const modalNode = this.searchTermModal.getModalNode();
+  focusoutEventHandler(modalNode) {
     DomUtil.hidden(modalNode);
   }
 
-  inputEventHandler({ target }) {
-    const modalNode = this.searchTermModal.getModalNode();
+  inputEventHandler(modalNode, { target }) {
     this.searchTermModal.insertTermList(modalNode, target.value);
   }
 
@@ -42,18 +38,15 @@ class ProductSearchForm {
   }
 
   addEvent($startingDom) {
-    const $trigger = Util.getElementByClassName(
-      $startingDom,
-      this.CLASSNAME.FORM,
-    );
+    const modalNode = this.searchTermModal.getModalNode();
+    const $trigger = Util.getElementByClassName($startingDom, this.CLASSNAME.FORM);
 
-    $trigger.addEventListener('focusin', this.focusinEventHandler.bind(this));
-    $trigger.addEventListener('focusout', this.focusoutEventHandler.bind(this));
-    $trigger.addEventListener('submit', this.submitEventHandler.bind(this));
-    $trigger.addEventListener(
-      'input',
-      Util.debounce(this.inputEventHandler.bind(this), 200),
-    );
+    $trigger.addEventListener('focusin', () => this.focusinEventHandler(modalNode));
+    $trigger.addEventListener('focusout', () => this.focusoutEventHandler(modalNode));
+    $trigger.addEventListener('submit', e => this.submitEventHandler(e));
+    $trigger.addEventListener('input', e => Util.debounce(this.inputEventHandler(modalNode, e), 500));
+
+    this.searchTermModal.addEvent();
   }
 
   template() {
