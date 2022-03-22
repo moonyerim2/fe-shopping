@@ -1,3 +1,4 @@
+/* eslint-disable arrow-parens */
 import { Util } from '../../../base/js/util.js';
 import { DomUtil } from '../../../base/js/DomUtil.js';
 import { SearchTermModal } from './search-term-modal/searchTermModal.js';
@@ -37,14 +38,78 @@ class ProductSearchForm {
     }
   }
 
+  checkSelectedItem(termList, className) {
+    for (let i = 0; i < termList.length; i++) {
+      if (termList[i].classList.contains(className)) {
+        return i;
+      }
+      if (i === termList.length - 1) {
+        return null;
+      }
+    }
+  }
+
+  downKeyHandler(termList, className) {
+    const currentIndex = this.checkSelectedItem(termList, className);
+
+    if (currentIndex === null) {
+      termList[0].classList.add(className);
+    } else if (currentIndex === termList.length - 1) {
+      termList[currentIndex].classList.remove(className);
+      termList[0].classList.add(className);
+    } else {
+      termList[currentIndex].classList.remove(className);
+      termList[currentIndex].nextElementSibling.classList.add(className);
+    }
+  }
+
+  upKeyHandler(termList, className) {
+    const currentIndex = this.checkSelectedItem(termList, className);
+
+    if (currentIndex !== null && !currentIndex) {
+      termList[currentIndex].classList.remove(className);
+    } else {
+      termList[currentIndex].classList.remove(className);
+      termList[currentIndex].previousElementSibling.classList.add(className);
+    }
+  }
+
+  keydownEventHandler(modalNode, e) {
+    const className = `${this.searchTermModal.CLASSNAME.LIST_ITEM}__select`;
+    const termList = Util.getElementByClassName(
+      modalNode,
+      this.searchTermModal.CLASSNAME.LIST,
+    ).children;
+
+    if (e.keyCode === 40) {
+      this.downKeyHandler(termList, className);
+    }
+
+    if (e.keyCode === 38) {
+      this.upKeyHandler(termList, className);
+    }
+  }
+
   addEvent($startingDom) {
     const modalNode = this.searchTermModal.getModalNode();
-    const $trigger = Util.getElementByClassName($startingDom, this.CLASSNAME.FORM);
+    const $trigger = Util.getElementByClassName(
+      $startingDom,
+      this.CLASSNAME.FORM,
+    );
 
-    $trigger.addEventListener('focusin', () => this.focusinEventHandler(modalNode));
-    $trigger.addEventListener('focusout', () => this.focusoutEventHandler(modalNode));
+    $trigger.addEventListener('focusin', () =>
+      this.focusinEventHandler(modalNode),
+    );
+    $trigger.addEventListener('focusout', () =>
+      this.focusoutEventHandler(modalNode),
+    );
+    $trigger.addEventListener('input', e =>
+      Util.debounce(this.inputEventHandler(modalNode, e), 500),
+    );
+    $trigger.addEventListener('keydown', e =>
+      this.keydownEventHandler(modalNode, e),
+    );
     $trigger.addEventListener('submit', e => this.submitEventHandler(e));
-    $trigger.addEventListener('input', e => Util.debounce(this.inputEventHandler(modalNode, e), 500));
 
     this.searchTermModal.addEvent();
   }

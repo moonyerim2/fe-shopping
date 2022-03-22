@@ -16,7 +16,12 @@
   
   &__list-item {
     padding: 5px 0;
+    
+    &__select {
+      border: 2px solid $mainColor;
+    }
   }
+
 
   &__title {
     padding-bottom: 10px;
