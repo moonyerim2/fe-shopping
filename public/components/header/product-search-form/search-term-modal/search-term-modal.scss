@@ -1,0 +1,44 @@
+.search-term-modal {
+  position: absolute;
+  visibility: hidden;
+  top: 100%;
+  right: 0;
+  width: 80%;
+  height: 323px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid $borderColor;
+  font-size: 12px;
+
+  &__list-item:first-child {
+    padding-bottom: 5px;
+  }
+  
+  &__list-item {
+    padding: 5px 0;
+    
+    &__select {
+      border: 2px solid $mainColor;
+    }
+  }
+
+
+  &__title {
+    padding-bottom: 10px;
+    margin-bottom: 5px;
+    border-bottom: 1px solid $borderColor;
+    font-weight: 500;
+  }
+
+  &__under-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: inherit;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+    background-color: $borderColor;
+  }
+}

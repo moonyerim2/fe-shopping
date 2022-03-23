@@ -1,6 +1,6 @@
 import { Util } from '../../base/js/util.js';
 import { TopBar } from './top-bar/topBar.js';
-import { ProductSearchForm } from './product-search-form/js/productSearchForm.js';
+import { ProductSearchForm } from './product-search-form/productSearchForm.js';
 import { Gnb } from './gnb/gnb.js';
 
 class Header {

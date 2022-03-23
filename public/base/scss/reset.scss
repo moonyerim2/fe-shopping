@@ -15,10 +15,12 @@ a {
 }
 
 ul, li {
+  box-sizing: border-box;
   list-style-type: none;
 }
 
 input {
+  box-sizing: border-box;
   border: 0px solid;
 }
 
