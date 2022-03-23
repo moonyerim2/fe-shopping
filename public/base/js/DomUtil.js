@@ -6,6 +6,10 @@ class DomUtil {
   static hidden(element) {
     element.style.visibility = 'hidden';
   }
+
+  static getElementByClassName($startingDom, className) {
+    return $startingDom.querySelector(`.${className}`);
+  }
 }
 
 export { DomUtil };

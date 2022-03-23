@@ -1,5 +1,4 @@
 import { DomUtil } from '../../../../base/js/DomUtil.js';
-import { Util } from '../../../../base/js/util.js';
 import { Storage } from '../../../../base/js/Storage.js';
 import { FetchController } from '../../../../base/js/FetchController.js';
 
@@ -9,6 +8,7 @@ class SearchTermModal {
       MODAL: 'search-term-modal',
       LIST: 'search-term-modal__list',
       LIST_ITEM: 'search-term-modal__list-item',
+      SELECTED_LIST_ITEM: 'search-term-modal__list-item__select',
     };
     this.STORAGE_KEYS = {
       recentSearchTerms: {
@@ -22,7 +22,21 @@ class SearchTermModal {
   }
 
   getModalNode() {
-    return Util.getElementByClassName(document, this.CLASSNAME.MODAL);
+    return DomUtil.getElementByClassName(document, this.CLASSNAME.MODAL);
+  }
+
+  getFirstItem() {
+    return DomUtil.getElementByClassName(
+      this.getModalNode(),
+      this.CLASSNAME.LIST,
+    ).firstElementChild;
+  }
+
+  getCurrentSelectedItem() {
+    return DomUtil.getElementByClassName(
+      this.getModalNode(),
+      this.CLASSNAME.SELECTED_LIST_ITEM,
+    );
   }
 
   fetchAutoCompleteSearchTerms(inputValue) {
@@ -32,37 +46,68 @@ class SearchTermModal {
       .then(terms => terms.suggestions.map(v => v.value));
   }
 
-  insertAutoComptetingList(modal, inputValue) {
+  insertAutoComptetingList(modalNode, inputValue) {
     return this.fetchAutoCompleteSearchTerms(inputValue)
       .then(dataList => {
         if (!dataList.length) {
-          DomUtil.hidden(modal);
-          modal.innerHTML = '';
+          DomUtil.hidden(modalNode);
+          modalNode.innerHTML = '';
         } else {
-          DomUtil.visible(modal);
+          DomUtil.visible(modalNode);
           const liTemplate = this.makeTermList(dataList);
           const ulTemplate = `<ul class = ${this.CLASSNAME.LIST}>${liTemplate}</ul>`;
-          modal.innerHTML = ulTemplate;
+          modalNode.innerHTML = ulTemplate;
         }
       })
       .catch(err => console.error(err));
   }
 
-  insertRecentSearchList(modal) {
-    DomUtil.visible(modal);
-    modal.innerHTML = this.recentSearchTermTemplate(
+  insertRecentSearchList(modalNode) {
+    DomUtil.visible(modalNode);
+    modalNode.innerHTML = this.recentSearchTermTemplate(
       this.storage.recentSearchTerms,
     );
   }
 
-  insertTermList(modal, inputValue) {
+  insertTermList(inputValue) {
+    const modalNode = this.getModalNode();
     if (!inputValue) {
-      this.insertRecentSearchList(modal);
+      this.insertRecentSearchList(modalNode);
       this.autoCompleteTermFetchController.abort();
     } else {
-      this.insertAutoComptetingList(modal, inputValue);
+      this.insertAutoComptetingList(modalNode, inputValue);
     }
-    return modal;
+    return modalNode;
+  }
+
+  removeSelectedClass(currentItem) {
+    currentItem.classList.remove(this.CLASSNAME.SELECTED_LIST_ITEM);
+  }
+
+  selectFirstItem(currentItem) {
+    const firstItem = this.getFirstItem();
+    firstItem.classList.add(this.CLASSNAME.SELECTED_LIST_ITEM);
+
+    if (currentItem && !currentItem.nextElementSibling) {
+      currentItem.classList.remove(this.CLASSNAME.SELECTED_LIST_ITEM);
+    }
+    return firstItem.textContent;
+  }
+
+  getAfterItem(currentItem, key) {
+    if (key === 'down') {
+      return currentItem.nextElementSibling;
+    }
+    if (key === 'up') {
+      return currentItem.previousElementSibling;
+    }
+  }
+
+  selectItem(currentItem, key) {
+    const afterItem = this.getAfterItem(currentItem, key);
+    afterItem.classList.add(this.CLASSNAME.SELECTED_LIST_ITEM);
+    this.removeSelectedClass(currentItem);
+    return afterItem.textContent;
   }
 
   addEvent() {

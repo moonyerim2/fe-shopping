@@ -1,4 +1,4 @@
-import { Util } from '../../base/js/util.js';
+import { DomUtil } from '../../base/js/DomUtil.js';
 import { TopBar } from './top-bar/topBar.js';
 import { ProductSearchForm } from './product-search-form/productSearchForm.js';
 import { Gnb } from './gnb/gnb.js';
@@ -17,7 +17,10 @@ class Header {
   }
 
   addEvent($startingDom) {
-    const $trigger = Util.getElementByClassName($startingDom, this.CLASSNAME);
+    const $trigger = DomUtil.getElementByClassName(
+      $startingDom,
+      this.CLASSNAME,
+    );
     this.productSearchForm.addEvent($trigger);
   }
 

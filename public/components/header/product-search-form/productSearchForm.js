@@ -25,85 +25,62 @@ class ProductSearchForm {
     DomUtil.hidden(modalNode);
   }
 
-  inputEventHandler(modalNode, { target }) {
-    this.searchTermModal.insertTermList(modalNode, target.value);
+  inputEventHandler({ target }) {
+    this.searchTermModal.insertTermList(target.value);
   }
 
   submitEventHandler(e) {
     e.preventDefault();
-    const $input = Util.getElementByClassName(e.target, this.CLASSNAME.INPUT);
+    const $input = DomUtil.getElementByClassName(
+      e.target,
+      this.CLASSNAME.INPUT,
+    );
+    if (!$input.value) {
+      return;
+    }
     const keyData = this.searchTermModal.STORAGE_KEYS.recentSearchTerms;
-    if ($input.value) {
-      this.searchTermModal.storage.storeInput(keyData, $input.value);
-    }
+    this.searchTermModal.storage.storeInput(keyData, $input.value);
   }
 
-  checkSelectedItem(termLiItems, className) {
-    for (let i = 0; i < termLiItems.length; i++) {
-      if (termLiItems[i].classList.contains(className)) {
-        return i;
-      }
-      if (i === termLiItems.length - 1) {
-        return null;
-      }
-    }
-  }
-
-  downKeyHandler(termLiItems, className, inputBox) {
-    const currentIndex = this.checkSelectedItem(termLiItems, className);
-
-    if (currentIndex === null) {
-      termLiItems[0].classList.add(className);
-    } else if (currentIndex === termLiItems.length - 1) {
-      termLiItems[currentIndex].classList.remove(className);
-      termLiItems[0].classList.add(className);
+  downKeyHandler(inputBox, key) {
+    const currentItem = this.searchTermModal.getCurrentSelectedItem();
+    if (!currentItem || !currentItem.nextElementSibling) {
+      inputBox.value = this.searchTermModal.selectFirstItem(currentItem);
     } else {
-      termLiItems[currentIndex].classList.remove(className);
-      termLiItems[currentIndex].nextElementSibling.classList.add(className);
-      inputBox.value = termLiItems[currentIndex].nextElementSibling.textContent;
+      inputBox.value = this.searchTermModal.selectItem(currentItem, key);
     }
   }
 
-  upKeyHandler(termLiItems, className, inputBox) {
-    const currentIndex = this.checkSelectedItem(termLiItems, className);
-    if (currentIndex === null) {
+  upKeyHandler(inputBox, key) {
+    const currentItem = this.searchTermModal.getCurrentSelectedItem();
+
+    if (!currentItem) {
       return;
     }
 
-    if (currentIndex !== null && !currentIndex) {
-      termLiItems[currentIndex].classList.remove(className);
+    if (currentItem === this.searchTermModal.getFirstItem()) {
+      this.searchTermModal.removeSelectedClass(currentItem);
     } else {
-      termLiItems[currentIndex].classList.remove(className);
-      termLiItems[currentIndex].previousElementSibling.classList.add(className);
-      inputBox.value = termLiItems[currentIndex].previousElementSibling.textContent;
+      inputBox.value = this.searchTermModal.selectItem(currentItem, key);
     }
   }
 
-  keydownEventHandler(modalNode, e) {
-    if (e.isComposing) return;
+  keydownEventHandler({ isComposing, keyCode, target }, modalNode) {
+    if (isComposing || modalNode.innerHTML === '') {
+      return;
+    }
 
-    const { keyCode, target } = e;
-    const className = `${this.searchTermModal.CLASSNAME.LIST_ITEM}__select`;
-    const termList = Util.getElementByClassName(
-      modalNode,
-      this.searchTermModal.CLASSNAME.LIST,
-    );
-    const termLiItems = termList ? termList.children : null;
-
-    if (termLiItems && termLiItems.length) {
-      if (keyCode === 40) {
-        this.downKeyHandler(termLiItems, className, target);
-      }
-
-      if (keyCode === 38) {
-        this.upKeyHandler(termLiItems, className, target);
-      }
+    if (keyCode === 40) {
+      this.downKeyHandler(target, 'down');
+    }
+    if (keyCode === 38) {
+      this.upKeyHandler(target, 'up');
     }
   }
 
   addEvent($startingDom) {
     const modalNode = this.searchTermModal.getModalNode();
-    const $trigger = Util.getElementByClassName(
+    const $trigger = DomUtil.getElementByClassName(
       $startingDom,
       this.CLASSNAME.FORM,
     );
@@ -115,10 +92,10 @@ class ProductSearchForm {
       this.focusoutEventHandler(modalNode),
     );
     $trigger.addEventListener('input', e =>
-      Util.debounce(this.inputEventHandler(modalNode, e), 500),
+      Util.debounce(this.inputEventHandler(e), 500),
     );
     $trigger.addEventListener('keydown', e =>
-      this.keydownEventHandler(modalNode, e),
+      this.keydownEventHandler(e, modalNode),
     );
     $trigger.addEventListener('submit', e => this.submitEventHandler(e));
 
