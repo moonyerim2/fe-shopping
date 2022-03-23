@@ -1,7 +1,7 @@
 /* eslint-disable arrow-parens */
-import { Util } from '../../../base/js/util.js';
 import { DomUtil } from '../../../base/js/DomUtil.js';
 import { SearchTermModal } from './search-term-modal/searchTermModal.js';
+import { Timer } from '../../../base/js/timer.js';
 
 class ProductSearchForm {
   constructor() {
@@ -9,6 +9,8 @@ class ProductSearchForm {
       FORM: 'product-search-form',
       INPUT: 'product-search-form__input',
     };
+    this.inputValue = null;
+    this.autoCompleteFetchTimer = new Timer();
     this.searchTermModal = new SearchTermModal();
     this.template = this.template();
   }
@@ -22,11 +24,19 @@ class ProductSearchForm {
   }
 
   focusoutEventHandler(modalNode) {
+    const currentItem = this.searchTermModal.getCurrentSelectedItem();
+    if (currentItem) {
+      this.searchTermModal.removeSelectedClass(currentItem);
+    }
     DomUtil.hidden(modalNode);
   }
 
   inputEventHandler({ target }) {
-    this.searchTermModal.insertTermList(target.value);
+    this.inputValue = target.value;
+    this.autoCompleteFetchTimer.debounce(
+      () => this.searchTermModal.insertTermList(target.value),
+      100,
+    );
   }
 
   submitEventHandler(e) {
@@ -38,34 +48,36 @@ class ProductSearchForm {
     if (!$input.value) {
       return;
     }
+
     const keyData = this.searchTermModal.STORAGE_KEYS.recentSearchTerms;
     this.searchTermModal.storage.storeInput(keyData, $input.value);
   }
 
-  downKeyHandler(inputBox, key) {
+  downKeyHandler(input, key) {
     const currentItem = this.searchTermModal.getCurrentSelectedItem();
     if (!currentItem || !currentItem.nextElementSibling) {
-      inputBox.value = this.searchTermModal.selectFirstItem(currentItem);
+      input.value = this.searchTermModal.selectFirstItem(currentItem);
     } else {
-      inputBox.value = this.searchTermModal.selectItem(currentItem, key);
+      input.value = this.searchTermModal.selectItem(currentItem, key);
     }
   }
 
-  upKeyHandler(inputBox, key) {
+  upKeyHandler(input, key) {
     const currentItem = this.searchTermModal.getCurrentSelectedItem();
-
     if (!currentItem) {
       return;
     }
 
     if (currentItem === this.searchTermModal.getFirstItem()) {
+      input.value = this.inputValue;
       this.searchTermModal.removeSelectedClass(currentItem);
     } else {
-      inputBox.value = this.searchTermModal.selectItem(currentItem, key);
+      input.value = this.searchTermModal.selectItem(currentItem, key);
     }
   }
 
-  keydownEventHandler({ isComposing, keyCode, target }, modalNode) {
+  keydownEventHandler(e, modalNode) {
+    const { isComposing, keyCode, target } = e;
     if (isComposing || modalNode.innerHTML === '') {
       return;
     }
@@ -74,7 +86,9 @@ class ProductSearchForm {
       this.downKeyHandler(target, 'down');
     }
     if (keyCode === 38) {
+      e.preventDefault();
       this.upKeyHandler(target, 'up');
+      target.setSelectionRange(target.value.length, target.value.length);
     }
   }
 
@@ -91,12 +105,10 @@ class ProductSearchForm {
     $trigger.addEventListener('focusout', () =>
       this.focusoutEventHandler(modalNode),
     );
-    $trigger.addEventListener('input', e =>
-      Util.debounce(this.inputEventHandler(e), 500),
-    );
     $trigger.addEventListener('keydown', e =>
       this.keydownEventHandler(e, modalNode),
     );
+    $trigger.addEventListener('input', e => this.inputEventHandler(e));
     $trigger.addEventListener('submit', e => this.submitEventHandler(e));
 
     this.searchTermModal.addEvent();
