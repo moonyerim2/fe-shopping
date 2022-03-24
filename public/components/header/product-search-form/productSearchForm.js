@@ -1,7 +1,8 @@
 /* eslint-disable arrow-parens */
 import { DomUtil } from '../../../base/js/DomUtil.js';
 import { SearchTermModal } from './search-term-modal/searchTermModal.js';
-import { Timer } from '../../../base/js/timer.js';
+import { Timer } from '../../../base/js/Timer.js';
+import { CategoryList } from './category-list/CategoryList.js';
 
 class ProductSearchForm {
   constructor() {
@@ -12,6 +13,7 @@ class ProductSearchForm {
     this.inputValue = null;
     this.autoCompleteFetchTimer = new Timer();
     this.searchTermModal = new SearchTermModal();
+    this.category = new CategoryList();
     this.template = this.template();
   }
 
@@ -94,31 +96,38 @@ class ProductSearchForm {
 
   addEvent($startingDom) {
     const modalNode = this.searchTermModal.getModalNode();
-    const $trigger = DomUtil.getElementByClassName(
+    const $form = DomUtil.getElementByClassName(
       $startingDom,
       this.CLASSNAME.FORM,
     );
+    const $input = DomUtil.getElementByClassName(
+      $startingDom,
+      this.CLASSNAME.INPUT,
+    );
 
-    $trigger.addEventListener('focusin', () =>
+    $input.addEventListener('focusin', () =>
       this.focusinEventHandler(modalNode),
     );
-    $trigger.addEventListener('focusout', () =>
+    $input.addEventListener('focusout', () =>
       this.focusoutEventHandler(modalNode),
     );
-    $trigger.addEventListener('keydown', e =>
+    $input.addEventListener('keydown', e =>
       this.keydownEventHandler(e, modalNode),
     );
-    $trigger.addEventListener('input', e => this.inputEventHandler(e));
-    $trigger.addEventListener('submit', e => this.submitEventHandler(e));
+    $input.addEventListener('input', e => this.inputEventHandler(e));
+    $form.addEventListener('submit', e => this.submitEventHandler(e));
 
     this.searchTermModal.addEvent();
+    this.category.addEvent();
   }
 
   template() {
     return `<form class="${this.CLASSNAME.FORM}">
-      <div class="product-search-form__category">전체</div>
+      ${this.category.template}
       <label class="size-0" for="productSearchInput"></label>
-      <input type="text" id="productSearchInput" class="${this.CLASSNAME.INPUT}" title="쿠팡 상품 검색" placeholder="찾고 싶은 상품을 검색해보세요"/>
+      <input type="text" id="productSearchInput" class="${
+        this.CLASSNAME.INPUT
+      }" title="쿠팡 상품 검색" placeholder="찾고 싶은 상품을 검색해보세요"/>
       <input type="submit" value="" class="product-search-form__btn"/>
       ${this.searchTermModal.template}
     </form>`;

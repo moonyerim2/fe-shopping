@@ -1,0 +1,23 @@
+.form-category {
+  width: 25%;
+  height: 100%;
+  font-size: 12px;
+  line-height: 42px;
+  outline: none;
+  border-right: 1px solid $borderColor;
+
+  &__title {
+   padding-left: 10px;
+  }
+
+  &__list {
+    padding-left: 10px;
+    width: 115px;
+    position: absolute;
+    top: 100%;
+    visibility: hidden;
+    background-color: #fff;
+    line-height: 30px;
+    border: 1px solid $borderColor;
+  }
+}
