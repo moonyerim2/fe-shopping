@@ -5,15 +5,11 @@ import { Gnb } from './gnb/gnb.js';
 
 class Header {
   constructor() {
-    this.creatInnerComponents();
     this.CLASSNAME = 'header';
-    this.template = this.template();
-  }
-
-  creatInnerComponents() {
     this.topBar = new TopBar();
     this.productSearchForm = new ProductSearchForm();
     this.gnb = new Gnb();
+    this.template = this.template();
   }
 
   addEvent($startingDom) {

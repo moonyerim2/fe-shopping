@@ -5,14 +5,8 @@ class App {
     this.initPage();
   }
 
-  creatInnerComponents() {
-    return {
-      header: new Header(),
-    };
-  }
-
   initPage() {
-    const { header } = this.creatInnerComponents();
+    const header = new Header();
 
     const $root = document.querySelector('#root');
     $root.insertAdjacentHTML('beforeend', header.template);
